@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Md Ummor Ali · Vivasoft · Pixenta BD</title>
+    <!-- google fonts & font awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            color: #e9e4f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            position: relative;
+            background: #0c0a17; /* fallback */
+            overflow-x: hidden;
+        }
+
+        /* Canvas background - the running HTML effect */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none; /* so it doesn't block clicks */
+            opacity: 0.7;
+        }
+
+        /* main portfolio card – ultra premium minimal, now above canvas */
+        .portfolio {
+            max-width: 1360px;
+            width: 100%;
+            background: rgba(20, 15, 35, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 3rem;
+            box-shadow: 0 50px 100px -30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+            z-index: 2;
+        }
+
+        .portfolio-inner {
+            display: grid;
+            grid-template-columns: 1fr 1.18fr;
+            gap: 0;
+        }
+
+        /* LEFT PANEL – minimal glass */
+        .left-panel {
+            background: rgba(25, 20, 40, 0.5);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* subtle light leak */
+        .left-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 30% 40%, rgba(140, 110, 255, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .image-frame {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 30px 40px -20px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.1) inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+
+        .image-frame:hover {
+            transform: scale(1.01);
+            box-shadow: 0 35px 50px -20px rgba(140, 100, 255, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            display: block;
+            opacity: 0.95;
+            transition: opacity 0.2s;
+        }
+
+        .image-frame:hover .profile-img {
+            opacity: 1;
+        }
+
+        .name {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            color: #ffffff;
+            margin-bottom: 0.2rem;
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: rgba(220, 210, 255, 0.7);
+            margin: 0.5rem 0 2rem 0;
+            padding: 0.3rem 0;
+            width: fit-content;
+            position: relative;
+            z-index: 2;
+            letter-spacing: 0.3px;
+        }
+
+        .location i {
+            color: rgba(170, 140, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .contact-block {
+            background: rgba(15, 12, 25, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            box-shadow: 0 20px 35px -20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            margin-top: 0.5rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(230, 220, 255, 0.8);
+            margin-bottom: 1.3rem;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-item i {
+            width: 2rem;
+            font-size: 1.2rem;
+            color: rgba(200, 170, 255, 0.9);
+            text-align: center;
+        }
+
+        .contact-item a, .contact-item span {
+            color: rgba(250, 245, 255, 0.9);
+            text-decoration: none;
+            font-weight: 400;
+            word-break: break-word;
+            transition: color 0.2s;
+        }
+
+        .contact-item a:hover {
+            color: #ffffff;
+        }
+
+        /* RIGHT PANEL – cleaner, no extra elements */
+        .right-panel {
+            background: rgba(18, 14, 30, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 3rem 2.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .right-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: radial-gradient(circle at 70% 20%, rgba(140, 100, 240, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Owner and CEO badge – refined */
+        .owner-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .owner-badge {
+            background: rgba(30, 25, 50, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: rgba(255, 245, 255, 0.95);
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.5rem 1.8rem 0.5rem 1.5rem;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(180, 150, 255, 0.2);
+            letter-spacing: 0.2px;
+            box-shadow: 0 10px 15px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .owner-badge i {
+            color: rgba(230, 200, 100, 0.9);
+            font-size: 1.1rem;
+        }
+
+        /* current work section – clean */
+        .current-work {
+            background: rgba(12, 10, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 1.8rem;
+            padding: 1.8rem 2rem;
+            margin: 0 0 2.5rem 0;
+            border-left: 4px solid rgba(160, 130, 240, 0.5);
+            color: rgba(240, 235, 255, 0.9);
+            box-shadow: 0 15px 25px -20px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-left: 4px solid rgba(180, 150, 255, 0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .current-work p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1.3rem;
+            color: rgba(220, 210, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .current-work p i {
+            color: rgba(180, 150, 255, 0.7);
+            font-size: 1.2rem;
+        }
+
+        .work-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .work-item {
+            background: rgba(20, 17, 30, 0.5);
+            padding: 0.9rem 1.5rem;
+            border-radius: 1.2rem;
+            font-weight: 400;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            color: rgba(230, 225, 255, 0.8);
+            font-size: 0.95rem;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .work-item:hover {
+            background: rgba(30, 25, 45, 0.6);
+            border-color: rgba(180, 150, 255, 0.2);
+        }
+
+        .work-item strong {
+            color: rgba(210, 190, 255, 1);
+            font-weight: 600;
+        }
+
+        /* role grid – minimal */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 0.5rem 0 1.5rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .role-card {
+            background: rgba(18, 15, 30, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 1.8rem;
+            padding: 1.5rem 1.3rem;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .role-card:hover {
+            background: rgba(25, 20, 40, 0.7);
+            border-color: rgba(180, 150, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .role-card i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #a28bff, #c9b5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .role-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.2px;
+        }
+
+        .role-card p {
+            font-size: 0.8rem;
+            color: rgba(200, 190, 230, 0.7);
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        /* credit line */
+        .credit {
+            margin-top: 2.5rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: rgba(200, 190, 240, 0.5);
+            padding-top: 0;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.5rem;
+        }
+
+        .credit strong {
+            color: rgba(220, 210, 255, 0.9);
+            font-weight: 600;
+        }
+
+        /* responsive */
+        @media (max-width: 1000px) {
+            .portfolio-inner {
+                grid-template-columns: 1fr;
+            }
+            .left-panel {
+                border-right: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                padding: 2.5rem 2rem;
+            }
+            .right-panel {
+                padding: 2.5rem 2rem;
+            }
+            .name {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0.8rem;
+            }
+            .portfolio {
+                border-radius: 2rem;
+            }
+            .image-frame {
+                width: 150px;
+                height: 150px;
+            }
+            .name {
+                font-size: 2rem;
+            }
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+            .left-panel, .right-panel {
+                padding: 2rem 1.5rem;
+            }
+            .contact-block {
+                padding: 1.5rem;
+            }
+            .current-work {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas for the running HTML effect - particle network -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="portfolio">
+        <div class="portfolio-inner">
+            <!-- LEFT PANEL -->
+            <div class="left-panel">
+                <div class="image-frame">
+                    <img src="https://image2url.com/r2/default/images/1772984137500-51080e03-3682-4279-88dc-567b9c283b69.jpg" alt="Md Ummor Ali" class="profile-img">
+                </div>
+                <h1 class="name">Md Ummor Ali</h1>
+                
+                <div class="location">
+                    <i class="fa-regular fa-compass"></i>
+                    <span>Chattogram, Rouzan, Pahartoli 4348</span>
+                </div>
+
+                <div class="contact-block">
+                    <div class="contact-item">
+                        <i class="fa-regular fa-phone"></i>
+                        <span><a href="tel:01805673921">01805673921</a></span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-regular fa-envelope"></i>
+                        <span><a href="mailto:aliomer20477@gmail.com">aliomer20477@gmail.com</a></span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>24/7 response</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+                <div class="owner-header">
+                    <span class="owner-badge"><i class="fa-regular fa-crown"></i> Owner & CEO · Pixenta BD</span>
+                </div>
+
+                <div class="current-work">
+                    <p>
+                        <i class="fa-regular fa-briefcase"></i> 
+                        current
+                    </p>
+                    <div class="work-detail">
+                        <div class="work-item"><strong>Vivasoft</strong> — Senior Software Engineer</div>
+                        <div class="work-item"><strong>Pixenta BD</strong> — Senior Software Engineer · Full-Stack · Graphic Designer · Digital Marketer</div>
+                    </div>
+                </div>
+
+                <div class="role-grid">
+                    <div class="role-card">
+                        <i class="fa-solid fa-code"></i>
+                        <h3>Senior Software Eng.</h3>
+                        <p>full‑stack, system design, team lead</p>
+                    </div>
+                    <div class="role-card">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                        <h3>Graphic Designer</h3>
+                        <p>brand identity, UI/UX, direction</p>
+                    </div>
+                    <div class="role-card">
+                        <i class="fa-regular fa-chart-bar"></i>
+                        <h3>Digital Marketer</h3>
+                        <p>SEO, analytics, strategy</p>
+                    </div>
+                    <div class="role-card">
+                        <i class="fa-regular fa-window-maximize"></i>
+                        <h3>Full‑Stack Web</h3>
+                        <p>React, Node, Python, cloud</p>
+                    </div>
+                </div>
+
+                <div class="credit">
+                    <strong></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            let particles = [];
+            const PARTICLE_COUNT = 80;
+            const MAX_DISTANCE = 180;
+            const PARTICLE_SIZE = 1.8;
+            
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.2;
+                    this.vy = (Math.random() - 0.5) * 0.2;
+                    this.radius = PARTICLE_SIZE + Math.random() * 1.5;
+                    // subtle color variation: mostly purple/blue tones
+                    const hue = 240 + Math.random() * 60; // 240-300 (blue to purple)
+                    this.color = `hsla(${hue}, 70%, 65%, 0.4)`;
+                }
+                
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    
+                    // wrap around edges
+                    if (this.x < 0) this.x = width;
+                    if (this.x > width) this.x = 0;
+                    if (this.y < 0) this.y = height;
+                    if (this.y > height) this.y = 0;
+                    
+                    // very gentle drift
+                    this.vx += (Math.random() - 0.5) * 0.01;
+                    this.vy += (Math.random() - 0.5) * 0.01;
+                    
+                    // limit velocity
+                    const maxVel = 0.4;
+                    if (Math.abs(this.vx) > maxVel) this.vx *= 0.95;
+                    if (Math.abs(this.vy) > maxVel) this.vy *= 0.95;
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+            
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                
+                // reposition particles if they exist
+                if (particles.length > 0) {
+                    particles.forEach(p => {
+                        // keep them roughly in bounds
+                        if (p.x > width) p.x = Math.random() * width;
+                        if (p.y > height) p.y = Math.random() * height;
+                    });
+                } else {
+                    initParticles();
+                }
+            }
+            
+            function drawConnections() {
+                // draw lines between nearby particles
+                ctx.strokeStyle = 'rgba(160, 140, 240, 0.12)';
+                ctx.lineWidth = 0.8;
+                
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < MAX_DISTANCE) {
+                            // opacity based on distance
+                            const opacity = (1 - distance / MAX_DISTANCE) * 0.25;
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(170, 150, 255, ${opacity})`;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            function animate() {
+                if (!ctx) return;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // update and draw particles
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                
+                drawConnections();
+                
+                requestAnimationFrame(animate);
+            }
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+            });
+            
+            // start everything
+            resizeCanvas();
+            initParticles();
+            animate();
+            
+            // occasionally add subtle variation to colors (very slow)
+            setInterval(() => {
+                particles.forEach(p => {
+                    if (Math.random() < 0.05) {
+                        const hue = 240 + Math.random() * 60;
+                        p.color = `hsla(${hue}, 70%, 65%, 0.4)`;
+                    }
+                });
+            }, 2000);
+        })();
+    </script>
+</body>
+</html>
